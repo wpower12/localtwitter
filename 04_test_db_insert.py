@@ -71,11 +71,11 @@ def storeTweet(cnx, tweet):
 # bucks county 40.333625,-75.120857
 # philly       39.959715,-75.165765
 res_cur = tweepy.Cursor(api.search_tweets, "",
-			geocode="40.333625,-75.120857,5km",
+			geocode="40.333625,-75.120857,10km",
 			count=100).pages()
 
 count = 0
-for tweets in limit_cursor(res_cur, 15*60, 180):
+for tweets in limited_cursor(res_cur, 15*60, 180):
 	# print(tweets)
 	for tweet in tweets:
 		Util.pprintTweet(tweet)
