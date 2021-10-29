@@ -6,7 +6,7 @@ from decouple import config
 
 import Util
 
-# Twitter API Object
+# Twitter API Connection
 auth = tweepy.OAuthHandler(config('T_CONSUME_KEY'), config('T_CONSUME_SECRET'))
 auth.set_access_token(config('T_ACCESS_KEY'), config('T_ACCESS_SECRET'))
 
@@ -19,6 +19,7 @@ cnx = mysql.connector.connect(user=config('DB_USER'),
 					database=config('DB_DATABASE'))
 
 
+# To, hopefully, avoid RateLimit issues by wrapping the Cursor/Pager.
 def limited_cursor(cursor, window_len, num_per_window):
 	wait_time = (window_len/(num_per_window+1)) # in seconds
 	while True:
@@ -67,16 +68,17 @@ def storeTweet(cnx, tweet):
 	cursor.close()
 
 
+### Where you define the actual search query.
 # geocodes lat/longs:
 # bucks county 40.333625,-75.120857
 # philly       39.959715,-75.165765
 res_cur = tweepy.Cursor(api.search_tweets, "",
 			geocode="40.333625,-75.120857,10km",
-			count=100).pages()
+			count=100).pages()   # Note - Use pages() here not items()
 
 count = 0
+# The wrapped Cursor handles paging and rates for us.
 for tweets in limited_cursor(res_cur, 15*60, 180):
-	# print(tweets)
 	for tweet in tweets:
 		Util.pprintTweet(tweet)
 		storeTweet(cnx, tweet)
