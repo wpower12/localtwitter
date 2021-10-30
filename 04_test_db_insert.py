@@ -72,8 +72,9 @@ def storeTweet(cnx, tweet):
 # geocodes lat/longs:
 # bucks county 40.333625,-75.120857
 # philly       39.959715,-75.165765
+# abington     40.138342,-75.126028
 res_cur = tweepy.Cursor(api.search_tweets, "",
-			geocode="40.333625,-75.120857,10km",
+			geocode="40.138342,-75.126028,10km",
 			count=100).pages()   # Note - Use pages() here not items()
 
 count = 0
