@@ -12,3 +12,7 @@ DB_PASSWORD="<YOUR-DB-PW>"
 DB_HOST="<YOUR-DB-HOST>"
 DB_DATABASE="<YOUR-DB-DATABASE-NAME>"
 ```
+
+The db methods will help create the following mysql schema:
+
+![db schema](doc/db_schema.png)
