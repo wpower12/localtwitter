@@ -11,6 +11,7 @@ TABLES = [
 		  `followers_count` varchar(45) NOT NULL,
 		  `created_at` datetime NOT NULL,
 		  `statuses_count` int NOT NULL,
+		  `countyfips` varchar(5) NOT NULL
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 	"""],
@@ -57,6 +58,15 @@ TABLES = [
 	"""]]
 
 CREATE_FKS = [
+	["user",
+	 ["""
+		ALTER TABLE `user` 
+		ADD CONSTRAINT `fk_couny`
+		  FOREIGN KEY (`countyfips`)
+		  REFERENCES `county` (`fips`)
+		  ON DELETE NO ACTION
+		  ON UPDATE NO ACTION;
+		"""]],
 	["tweet", 
 	 ["""
 		ALTER TABLE `tweet` 
@@ -132,11 +142,11 @@ def populateCountyTable(cnx, county_df):
 """
 Inserts (or ignores duplicates) of the User, the Tweet, and its Hashtags.
 """
-def storeTweet(cnx, tweet):
+def storeTweet(cnx, tweet, fips):
 	insert_user = ("INSERT IGNORE INTO `user` "
-		"(`id`,`name`,`screen_name`,`location`,`followers_count`,`created_at`, `statuses_count`) "
+		"(`id`,`name`,`screen_name`,`location`,`followers_count`,`created_at`, `statuses_count`, `countyfips`) "
 		"VALUES "
-		"(%(id)s, %(name)s, %(screen_name)s, %(location)s, %(followers_count)s, %(created_at)s, %(statuses_count)s)")
+		"(%(id)s, %(name)s, %(screen_name)s, %(location)s, %(followers_count)s, %(created_at)s, %(statuses_count)s, %(countyfips)s)")
 
 	insert_tweet = ("INSERT IGNORE INTO `tweet` "
 		"(`id`,`userid`,`created_at`,`text`) "
@@ -157,7 +167,8 @@ def storeTweet(cnx, tweet):
 		'location': tweet.user.location,
 		'followers_count': tweet.user.followers_count,
 		'created_at': datetime.strftime(tweet.user.created_at, '%Y-%m-%d %H:%M:%S'),
-		'statuses_count': tweet.user.statuses_count
+		'statuses_count': tweet.user.statuses_count,
+		'countyfips': fips
 	}
 
 	data_tweet = {

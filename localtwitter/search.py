@@ -18,7 +18,8 @@ def limited_cursor(cursor, window_len, num_per_window):
 			break
 
 
-def geocodeSearchAndInsert(cnx, twitter_api, geocode, 
+def geocodeSearchAndInsert(cnx, twitter_api, geocode,
+	fips="", 
 	search_term="", 
 	report=False, 
 	limit=None, 
@@ -36,7 +37,7 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 		broke = False
 		try:
 			for tweet in tweets:
-				storeTweet(cnx, tweet)
+				storeTweet(cnx, tweet, fips)
 				
 				if report:
 					pprintTweet(tweet)
@@ -67,7 +68,7 @@ def allCountySearchAndInsert(cnx, twitter_api,
 	total_tweets = 0
 	for fips, geo, cname, state in cur.fetchall():
 		geocode="{},{}".format(geo, distance)
-		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, limit=limit)
+		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, fips=fips, limit=limit)
 		total_tweets += tweets_found
 		if(report):
 			print("processed {:>15s}, {} - {:6} tweets {:10} total".format(cname, state, tweets_found, total_tweets))
