@@ -8,27 +8,19 @@ from datetime import datetime
 
 
 def limited_cursor(cursor, window_len, num_per_window):
-	wait_time = (window_len/(num_per_window+1)) # in seconds
-	first = True
+	wait_time = (window_len/(num_per_window+2)) # in seconds
 	while True:
-		if not first:
-			time.sleep(wait_time)
-		else:
-			first = False
-			
+		time.sleep(wait_time)
 		try:
 			yield next(cursor)
-		except tweepy.TooManyRequests:
-			print("rate limited")
-			break
 		except StopIteration:
-			print("stopped?")
+			# print("stopped.")
 			break
 
 
 def geocodeSearchAndInsert(cnx, twitter_api, geocode, 
 	search_term="", 
-	report=True, 
+	report=False, 
 	limit=None, 
 	window_len=15*60,
 	num_per_window=180):
@@ -42,16 +34,21 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 	count = 0
 	for tweets in limited_cursor(res_cursor, window_len, num_per_window):
 		broke = False
-		for tweet in tweets:
-			storeTweet(cnx, tweet)
-			
-			if report:
-				pprintTweet(tweet)
+		try:
+			for tweet in tweets:
+				storeTweet(cnx, tweet)
+				
+				if report:
+					pprintTweet(tweet)
 
-			count += 1
-			if limit != None and count >= limit:
-				broke = True
-				break
+				count += 1
+				if limit != None and count >= limit:
+					broke = True
+					break
+
+		except tweepy.error.TooManyRequests:
+			print("rate limited")
+			break
 
 		if broke:
 			break
@@ -60,15 +57,18 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 
 
 def allCountySearchAndInsert(cnx, twitter_api,
-	report=True, 
-	limit=None, 
-	window_len=15*60,
-	num_per_window=180):
+	report=True,
+	distance="5km", 
+	limit=None):
 	
 	# first get counties from db.
 	cur = cnx.cursor()
-	res = cur.execute("SELECT fips, geocode")
-	# for each one, craft a geocode, and use the method about to 
-	# actually query. 
+	cur.execute("SELECT fips, geocode, countyname, state FROM county;")
+	total_tweets = 0
+	for fips, geo, cname, state in cur.fetchall():
+		geocode="{},{}".format(geo, distance)
+		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, limit=limit)
+		total_tweets += tweets_found
+		if(report):
+			print("processed {:>15s}, {} - {:6} tweets {:10} total".format(cname, state, tweets_found, total_tweets))
 
-	pass
