@@ -40,7 +40,20 @@ TABLES = [
 		  `hashtag` varchar(45) NOT NULL,
 		  PRIMARY KEY (`tweetid`),
 		  UNIQUE KEY `TH_UNIQUE` (`hashtag`,`tweetid`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;"""]]
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+	"""],
+	["county",
+	"""
+		CREATE TABLE `county` (
+		  `fips` varchar(5) NOT NULL,
+		  `lat` decimal(10,8) DEFAULT NULL,
+		  `long` decimal(11,8) DEFAULT NULL,
+		  `geocode` varchar(30) DEFAULT NULL,
+		  `statename` varchar(45) DEFAULT NULL,
+		  `state` varchar(2) DEFAULT NULL,
+		  PRIMARY KEY (`fips`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+	"""]]
 
 CREATE_FKS = [
 	["tweet", 
@@ -69,7 +82,8 @@ CREATE_FKS = [
 		  ON DELETE NO ACTION
 		  ON UPDATE NO ACTION;
 	  """]]]
-				
+		
+		
 def createSchema(cnx, db_name):
 	cur = cnx.cursor()
 
@@ -86,7 +100,36 @@ def createSchema(cnx, db_name):
 			cur.execute(fk_sql)
 		print("created fk's for {}".format(table))
 
+	cnx.commit()
+	cursor.close()
 
+
+def populateCountyTable(cnx, county_df):
+	insert_county = (
+		"INSERT IGNORE INTO `county`"
+		"(`fips`, `lat`, `long`, `geocode`, `statename`, `state`) "
+		"VALUES "
+		"(%(fips)s, %(lat)s, %(long)s, %(geocode)s, %(statename)s, %(state)s)")
+
+	cur = cnx.cursor()
+	for county_row in county_df.iterrows():
+		county_raw = county_row[1]
+		county_data = {
+			'fips': county_raw['FIPS'],
+			'lat': county_raw['lat'],
+			'long': county_raw['long'],
+			'geocode': "{:.8f},{:.8f}".format(county_raw['lat'], county_raw['long']),
+			'statename': county_raw['STATE_NAME'],
+			'state': county_raw['STUSAB']
+		}
+		cur.execute(insert_county, county_data)
+
+	cnx.commit()
+	cur.close()
+
+"""
+Inserts (or ignores duplicates) of the User, the Tweet, and its Hashtags.
+"""
 def storeTweet(cnx, tweet):
 	insert_user = ("INSERT IGNORE INTO `user` "
 		"(`id`,`name`,`screen_name`,`location`,`followers_count`,`created_at`, `statuses_count`) "
