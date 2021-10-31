@@ -57,3 +57,18 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 			break
 
 	return count
+
+
+def allCountySearchAndInsert(cnx, twitter_api,
+	report=True, 
+	limit=None, 
+	window_len=15*60,
+	num_per_window=180):
+	
+	# first get counties from db.
+	cur = cnx.cursor()
+	res = cur.execute("SELECT fips, geocode")
+	# for each one, craft a geocode, and use the method about to 
+	# actually query. 
+
+	pass

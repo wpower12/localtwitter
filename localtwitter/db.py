@@ -46,6 +46,7 @@ TABLES = [
 	"""
 		CREATE TABLE `county` (
 		  `fips` varchar(5) NOT NULL,
+		  `countyname` varchar(55) DEFAULT NULL,
 		  `lat` decimal(10,8) DEFAULT NULL,
 		  `long` decimal(11,8) DEFAULT NULL,
 		  `geocode` varchar(30) DEFAULT NULL,
@@ -107,15 +108,16 @@ def createSchema(cnx, db_name):
 def populateCountyTable(cnx, county_df):
 	insert_county = (
 		"INSERT IGNORE INTO `county`"
-		"(`fips`, `lat`, `long`, `geocode`, `statename`, `state`) "
+		"(`fips`, `countyname`, `lat`, `long`, `geocode`, `statename`, `state`) "
 		"VALUES "
-		"(%(fips)s, %(lat)s, %(long)s, %(geocode)s, %(statename)s, %(state)s)")
+		"(%(fips)s, %(countyname)s, %(lat)s, %(long)s, %(geocode)s, %(statename)s, %(state)s)")
 
 	cur = cnx.cursor()
 	for county_row in county_df.iterrows():
 		county_raw = county_row[1]
 		county_data = {
 			'fips': county_raw['FIPS'],
+			'countyname': county_raw['NAME'],
 			'lat': county_raw['lat'],
 			'long': county_raw['long'],
 			'geocode': "{:.8f},{:.8f}".format(county_raw['lat'], county_raw['long']),
