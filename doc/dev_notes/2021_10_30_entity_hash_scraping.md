@@ -76,3 +76,5 @@ Ok so I think I have a working full county gather. Just taking 5 seconds per cou
 I added a few things to the database. Notably, the user table now has a forgein key to the county tabke through a `countyfips` field. 
 
 Gah, really hoping this doesn't except out due to a rate limit. I'm hoping I was robust enough. Eventually I need to figure out using the API to poll if I'm limited or not, so I could handle waiting out a window before retrying. so far so good. almost 2k tweets gathered while i wrote this section. 
+
+
