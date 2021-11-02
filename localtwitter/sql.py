@@ -55,6 +55,7 @@ CREATE_TABLES = [
 		  `statename` varchar(45) DEFAULT NULL,
 		  `state` varchar(2) DEFAULT NULL,
   		  `last_tweet_id` bigint DEFAULT NULL,
+  		  `ignore_county` tinyint DEFAULT 0,
 		  PRIMARY KEY (`fips`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 	"""],
@@ -169,4 +170,11 @@ INSERT_TWEETURL = ("INSERT IGNORE INTO `tweeturls` "
 
 UPDATE_COUNTY_LASTTWEET = ("UPDATE `county` "
 	"SET `last_tweet_id`=%(last_tweet_id)s "
+	"WHERE fips=%(fips)s")
+
+RESET_COUNTY_IGNORE = ("UPDATE `county` "
+	"SET `ignore_county`=0")
+
+IGNORE_COUNTY = ("UPDATE `county` "
+	"SET `ignore_county`=1 "
 	"WHERE fips=%(fips)s")

@@ -3,7 +3,7 @@ from datetime import datetime
 from .sql import CREATE_TABLES, CREATE_FKS
 from .sql import INSERT_USER, INSERT_TWEET, INSERT_COUNTY
 from .sql import INSERT_HASH, INSERT_URL, INSERT_TWEETHASH, INSERT_TWEETURL
-from .sql import UPDATE_COUNTY_LASTTWEET
+from .sql import UPDATE_COUNTY_LASTTWEET, IGNORE_COUNTY, RESET_COUNTY_IGNORE
 	
 		
 def createSchema(cnx, db_name):
@@ -13,7 +13,6 @@ def createSchema(cnx, db_name):
 	print("created db {}".format(db_name))
 
 	for table, create_sql in CREATE_TABLES:
-		print(table)
 		cur.execute(create_sql)
 		print("created table {}".format(table))
 
@@ -103,3 +102,16 @@ def storeTweet(cnx, tweet, fips):
 
 	cnx.commit()
 	cursor.close()
+
+
+def resetCountyIgnore(cnx):
+	cursor = cnx.cursor()
+	cursor.execute(RESET_COUNTY_IGNORE)
+	# cursor.close()
+
+
+def ignoreCounty(cnx, fips):
+	cursor = cnx.cursor()
+	cursor.execute(IGNORE_COUNTY, {'fips': fips})
+	# cursor.close()
+	

@@ -1,7 +1,7 @@
 import tweepy
 import time
 
-from .db   import storeTweet
+from .db   import storeTweet, ignoreCounty, resetCountyIgnore
 from .util import pprintTweet
 
 from datetime import datetime
@@ -62,16 +62,22 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 def allCountySearchAndInsert(cnx, twitter_api,
 	report=True,
 	distance="5km", 
-	limit=None):
+	limit=None,
+	reset_ignore=False):
 	
-	# first get counties from db.
+	if(reset_ignore):
+		resetCountyIgnore(cnx)
+
 	cur = cnx.cursor()
-	cur.execute("SELECT fips, geocode, countyname, state, last_tweet_id FROM county;")
+	cur.execute("SELECT fips, geocode, countyname, state, last_tweet_id FROM county WHERE ignore_county=0;")
 	total_tweets = 0
 	for fips, geo, cname, state, last_tweet in cur.fetchall():
 		geocode="{},{}".format(geo, distance)
 		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, fips=fips, limit=limit, since_id=last_tweet)
+
+		if(tweets_found == 0):
+			ignoreCounty(cnx, fips)
+
 		total_tweets += tweets_found
 		if(report):
 			print("processed {:>15s}, {} - {:6} tweets {:10} total".format(cname, state, tweets_found, total_tweets))
-
