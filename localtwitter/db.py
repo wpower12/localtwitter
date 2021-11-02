@@ -3,11 +3,11 @@ from datetime import datetime
 from .sql import CREATE_TABLES, CREATE_FKS
 from .sql import INSERT_USER, INSERT_TWEET, INSERT_COUNTY
 from .sql import INSERT_HASH, INSERT_URL, INSERT_TWEETHASH, INSERT_TWEETURL
+from .sql import UPDATE_COUNTY_LASTTWEET
 	
 		
 def createSchema(cnx, db_name):
 	cur = cnx.cursor()
-
 	cur.execute("CREATE DATABASE {};".format(db_name))
 	cnx.database = db_name
 	print("created db {}".format(db_name))
@@ -44,6 +44,7 @@ def populateCountyTable(cnx, county_df):
 	cnx.commit()
 	cur.close()
 
+
 """
 Inserts (or ignores duplicates) of the User, the Tweet, and its Hashtags.
 """
@@ -66,9 +67,16 @@ def storeTweet(cnx, tweet, fips):
 		'text': tweet.text
 	}
 
+	data_lasttweet = {
+		'last_tweet_id': tweet.id,
+		'fips': fips
+	}
+
 	cursor = cnx.cursor()
 	cursor.execute(INSERT_USER,  data_user)
 	cursor.execute(INSERT_TWEET, data_tweet)
+	cursor.execute(UPDATE_COUNTY_LASTTWEET, data_lasttweet)
+	cnx.commit()
 
 	if( tweet.entities != None ):
 		for hashtag in tweet.entities['hashtags']:

@@ -54,6 +54,7 @@ CREATE_TABLES = [
 		  `geocode` varchar(30) DEFAULT NULL,
 		  `statename` varchar(45) DEFAULT NULL,
 		  `state` varchar(2) DEFAULT NULL,
+  		  `last_tweet_id` bigint DEFAULT NULL,
 		  PRIMARY KEY (`fips`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 	"""],
@@ -133,7 +134,7 @@ CREATE_FKS = [
 
 
 '''
-Object Insertion SQL.
+Model SQL.
 '''
 INSERT_COUNTY = (
 	"INSERT IGNORE INTO `county`"
@@ -165,3 +166,7 @@ INSERT_URL = ("INSERT IGNORE INTO `url` "
 INSERT_TWEETURL = ("INSERT IGNORE INTO `tweeturls` "
 	"(`tweetid`, `urlhash`)"
 	"VALUES (%(tweetid)s, MD5(%(url_p)s))")
+
+UPDATE_COUNTY_LASTTWEET = ("UPDATE `county` "
+	"SET `last_tweet_id`=%(last_tweet_id)s "
+	"WHERE fips=%(fips)s")

@@ -21,6 +21,7 @@ def limited_cursor(cursor, window_len, num_per_window):
 def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 	fips="", 
 	search_term="", 
+	since_id=None,
 	report=False, 
 	limit=None, 
 	window_len=15*60,
@@ -29,6 +30,7 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 	res_cursor = tweepy.Cursor(twitter_api.search_tweets, 
 			search_term,
 			geocode=geocode,
+			since_id=since_id,
 			count=100).pages()   # Note - Use pages() here not items()
 
 	# The wrapped Cursor handles paging and rates for us.
@@ -64,11 +66,11 @@ def allCountySearchAndInsert(cnx, twitter_api,
 	
 	# first get counties from db.
 	cur = cnx.cursor()
-	cur.execute("SELECT fips, geocode, countyname, state FROM county;")
+	cur.execute("SELECT fips, geocode, countyname, state, last_tweet_id FROM county;")
 	total_tweets = 0
-	for fips, geo, cname, state in cur.fetchall():
+	for fips, geo, cname, state, last_tweet in cur.fetchall():
 		geocode="{},{}".format(geo, distance)
-		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, fips=fips, limit=limit)
+		tweets_found = geocodeSearchAndInsert(cnx, twitter_api, geocode, fips=fips, limit=limit, since_id=last_tweet)
 		total_tweets += tweets_found
 		if(report):
 			print("processed {:>15s}, {} - {:6} tweets {:10} total".format(cname, state, tweets_found, total_tweets))
