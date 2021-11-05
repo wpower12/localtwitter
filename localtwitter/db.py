@@ -3,17 +3,18 @@ from datetime import datetime
 from .sql import CREATE_TABLES, CREATE_FKS
 from .sql import INSERT_USER, INSERT_TWEET, INSERT_COUNTY
 from .sql import INSERT_HASH, INSERT_URL, INSERT_TWEETHASH, INSERT_TWEETURL
+from .sql import INSERT_NAMED_ENTITY, INSERT_TWEET_NE
 from .sql import UPDATE_COUNTY_LASTTWEET, IGNORE_COUNTY, RESET_COUNTY_IGNORE
 	
 		
-def createSchema(cnx, db_name):
+def createSchema(cnx, db_name, encoding="utf8mb4_0900_ai_ci"):
 	cur = cnx.cursor()
 	cur.execute("CREATE DATABASE {};".format(db_name))
 	cnx.database = db_name
 	print("created db {}".format(db_name))
 
 	for table, create_sql in CREATE_TABLES:
-		cur.execute(create_sql)
+		cur.execute(create_sql, {'encoding': encoding})
 		print("created table {}".format(table))
 
 	for table, fks in CREATE_FKS:
@@ -89,6 +90,7 @@ def storeTweet(cnx, tweet, fips):
 
 			cursor.execute(INSERT_HASH,      data_hash)
 			cursor.execute(INSERT_TWEETHASH, data_tweethash)
+
 		for url in tweet.entities['urls']:
 			data_url = {
 				'url_p': url['expanded_url']	
@@ -104,6 +106,44 @@ def storeTweet(cnx, tweet, fips):
 	cursor.close()
 
 
+def storeNamedEntity(cnx, tweet_id, named_entity):
+	# check if id is there, otherwise make a new one and recover id from cnx 
+	ne_string = named_entity.text.replace("'", "")
+
+	cur = cnx.cursor()
+	cur.execute("SELECT id, name FROM `namedentity` WHERE name='{}';".format(ne_string))
+	nes = cur.fetchall()
+	if( len(nes) > 0 ):
+		ne_id = nes[0][0]
+	else:
+		# make a new one
+		data_ne = {
+			'name': ne_string,
+			'type': named_entity.label_
+		}
+		print(data_ne)
+		cur.execute(INSERT_NAMED_ENTITY, data_ne)
+		print(cur)
+		ne_id = cur.lastrowid
+		print(ne_id)
+		cnx.commit()
+
+	# store the tweet-ne link
+	data_tne = {
+		'tweetid': tweet_id,
+		'nentityid': ne_id,
+	}
+	cur.execute(INSERT_TWEET_NE, data_tne)
+
+	cnx.commit()
+	cur.close()
+
+
+def setTweetAsProcessed(cnx, tweet_id):
+	cur = cnx.cursor()
+	cur.execute("UPDATE `tweet` SET processed=1 WHERE id={}".format(tweet_id))
+
+
 def resetCountyIgnore(cnx):
 	cursor = cnx.cursor()
 	cursor.execute(RESET_COUNTY_IGNORE)
@@ -115,3 +155,5 @@ def ignoreCounty(cnx, fips):
 	cursor.execute(IGNORE_COUNTY, {'fips': fips})
 	# cursor.close()
 	
+
+

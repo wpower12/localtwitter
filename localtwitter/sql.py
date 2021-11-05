@@ -14,7 +14,7 @@ CREATE_TABLES = [
 		  `statuses_count` int NOT NULL,
 		  `countyfips` varchar(5) NOT NULL,
 		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
 	["tweet", 
 	"""
@@ -25,14 +25,14 @@ CREATE_TABLES = [
 		  `text` varchar(140) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  KEY `user` (`userid`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
 	["hashtag", 
 	"""
 		CREATE TABLE `hashtag` (
 		  `text` varchar(45) NOT NULL,
 		  PRIMARY KEY (`text`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s
 
 	"""],
 	["tweethashtag", 
@@ -42,7 +42,7 @@ CREATE_TABLES = [
 		  `hashtag` varchar(45) NOT NULL,
 		  PRIMARY KEY (`tweetid`),
 		  UNIQUE KEY `TH_UNIQUE` (`hashtag`,`tweetid`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
 	["county",
 	"""
@@ -57,7 +57,7 @@ CREATE_TABLES = [
   		  `last_tweet_id` bigint DEFAULT NULL,
   		  `ignore_county` tinyint DEFAULT 0,
 		  PRIMARY KEY (`fips`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
 	["url",
 	"""
@@ -67,7 +67,7 @@ CREATE_TABLES = [
 		  `url` varchar(256) DEFAULT NULL,
 		  PRIMARY KEY (`id`),
 		  UNIQUE KEY `urlhash_UNIQUE` (`urlhash`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
 	["tweeturl",
 	"""
@@ -76,7 +76,27 @@ CREATE_TABLES = [
 		  `urlhash` char(32) NOT NULL,
 		  PRIMARY KEY (`tweetid`),
 		  KEY `fk_url_idx` (`urlhash`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
+	"""],
+	["namedentity",
+	"""
+		CREATE TABLE `namedentity` (
+		  `id` int NOT NULL AUTO_INCREMENT,
+		  `name` varchar(256) NOT NULL,
+		  `type` varchar(10) DEFAULT NULL,
+		  PRIMARY KEY (`id`),
+  		  UNIQUE KEY `name_UNIQUE` (`name`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
+
+	"""],
+	["tweetnamedentities",
+	"""
+		CREATE TABLE `tweetnamedentities` (
+		  `tweetid` bigint NOT NULL,
+		  `nentityid` int DEFAULT NULL,
+		  PRIMARY KEY (`tweetid`),
+		  KEY `fk_nentity_idx` (`nentityid`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""]]
 
 CREATE_FKS = [
@@ -131,8 +151,20 @@ CREATE_FKS = [
 		  REFERENCES `url` (`urlhash`)
 		  ON DELETE NO ACTION
 		  ON UPDATE NO ACTION;
-	  """]]]
-
+	  """]],
+	["namedentity",
+	 ["""
+	 	ALTER TABLE `namednetity`
+	 	ADD CONSTRAINT `fk_tweetnamedentities_ne` 
+	 	FOREIGN KEY (`nentityid`) 
+	 	REFERENCES `namedentity` (`id`)
+	  """,
+	  """
+	  ALTER TABLE `namednetity`
+	 	ADD CONSTRAINT `fk_tweetnamedentities_tweet` 
+	 	FOREIGN KEY (`tweetid`) 
+	 	REFERENCES `tweet` (`id`)
+	  """,]]]
 
 '''
 Model SQL.
@@ -167,6 +199,14 @@ INSERT_URL = ("INSERT IGNORE INTO `url` "
 INSERT_TWEETURL = ("INSERT IGNORE INTO `tweeturls` "
 	"(`tweetid`, `urlhash`)"
 	"VALUES (%(tweetid)s, MD5(%(url_p)s))")
+
+INSERT_NAMED_ENTITY = ("INSERT INTO `namedentity` "
+	"(`name`, `type`) "
+	"VALUES (%(name)s, %(type)s)")
+
+INSERT_TWEET_NE = ("INSERT IGNORE INTO `tweetnamedentities` "
+	"(`tweetid`, `nentityid`) "
+	"VALUES (%(tweetid)s, %(nentityid)s)")
 
 UPDATE_COUNTY_LASTTWEET = ("UPDATE `county` "
 	"SET `last_tweet_id`=%(last_tweet_id)s "
