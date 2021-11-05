@@ -13,7 +13,8 @@ cnx = mysql.connector.connect(user=config('DB_USER'),
 					password=config('DB_PASSWORD'),
 					host=config('DB_HOST'))
 
-localtwitter.createSchema(cnx, DATABASE_NAME)
+# have to change this on the school server. forgot what the version theres is. 
+localtwitter.createSchema(cnx, DATABASE_NAME, encoding="utf8mb4_0900_ai_ci")
 localtwitter.populateCountyTable(cnx, pd.read_csv(COUNTY_INFO_FN, dtype={'FIPS': str}))
 
 print("search and insert.")

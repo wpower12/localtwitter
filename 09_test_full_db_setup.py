@@ -13,10 +13,10 @@ cnx = mysql.connector.connect(user=config('DB_USER'),
 					password=config('DB_PASSWORD'),
 					host=config('DB_HOST'))
 
-cur = cnx.cursor()
-cur.execute("DROP DATABASE {}".format(DATABASE_NAME))
-cnx.commit()
-cur.close()
+# cur = cnx.cursor()
+# cur.execute("DROP DATABASE {}".format(DATABASE_NAME))
+# cnx.commit()
+# cur.close()
 
 localtwitter.createSchema(cnx, DATABASE_NAME)
 localtwitter.populateCountyTable(cnx, pd.read_csv(COUNTY_INFO_FN, dtype={'FIPS': str}))
