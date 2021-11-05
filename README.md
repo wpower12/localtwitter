@@ -1,5 +1,5 @@
 # localtwitter
-Right now, this shows how to mine 'localized' users, by searching for tweets within a specific distance of a lat/long pair. This is possible because of the geocode parameter exposed in the twitter search api. The scripts here will help create a db, and then fill it with tweet data. 
+Set of scripts to help gather twitter data from users who are able to be located by the geocode search parameter provided by the twitter API.
 
 To make any of this work, you'll need to create a `.env` file in the root project directory that contains the following fields:
 ```
@@ -12,6 +12,9 @@ DB_PASSWORD="<YOUR-DB-PW>"
 DB_HOST="<YOUR-DB-HOST>"
 DB_DATABASE="<YOUR-DB-DATABASE-NAME>"
 ```
+
+
+The example scripts show how to start up a full time gather, and a draft of how you'd extract named entities from the existing tweets. 
 
 The db methods will help create the following mysql schema:
 
