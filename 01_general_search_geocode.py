@@ -1,6 +1,7 @@
-import Util
 import twitter
 from decouple import config
+
+import localtwitter
 
 api = twitter.Api(consumer_key=config('T_CONSUME_KEY'),
 				consumer_secret=config('T_CONSUME_SECRET'),
@@ -14,4 +15,4 @@ results = api.GetSearch(geocode="geocode:39.959715,-75.165765,10km", result_type
 
 print(results)
 for s in results:
-	Util.pprintStatus(s)
+	localtwitter.pprintStatus(s)

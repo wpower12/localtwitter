@@ -4,7 +4,7 @@ import mysql.connector
 from datetime import datetime
 from decouple import config
 
-import Util
+import localtwitter
 
 # Twitter API Connection
 auth = tweepy.OAuthHandler(config('T_CONSUME_KEY'), config('T_CONSUME_SECRET'))
@@ -81,7 +81,7 @@ count = 0
 # The wrapped Cursor handles paging and rates for us.
 for tweets in limited_cursor(res_cur, 15*60, 180):
 	for tweet in tweets:
-		Util.pprintTweet(tweet)
+		localtwitter.pprintTweet(tweet)
 		storeTweet(cnx, tweet)
 		count += 1
 

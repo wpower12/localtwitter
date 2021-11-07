@@ -2,7 +2,7 @@ import time
 import tweepy
 from decouple import config
 
-import Util
+import localtwitter
 
 auth = tweepy.OAuthHandler(config('T_CONSUME_KEY'), config('T_CONSUME_SECRET'))
 auth.set_access_token(config('T_ACCESS_KEY'), config('T_ACCESS_SECRET'))
@@ -33,7 +33,7 @@ count = 0
 for tweets in limit_handled(res_cur, 15*60, 180):
 	# print(tweets)
 	for tweet in tweets:
-		Util.pprintTweet(tweet)
+		localtwitter.pprintTweet(tweet)
 		count += 1
 
 print(count)
