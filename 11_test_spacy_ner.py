@@ -1,6 +1,5 @@
 import spacy
 import mysql.connector
-# from textblob import TextBlob
 from decouple import config
 
 import localtwitter
