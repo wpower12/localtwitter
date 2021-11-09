@@ -221,7 +221,6 @@ IGNORE_COUNTY = ("UPDATE `county` "
 
 
 # Visulization/Reporting Queries
-
 GET_HASHTAG_MENTIONCOUNT_HIST = """
 	SELECT num_mentions, COUNT(*)
 	FROM 
@@ -230,3 +229,10 @@ GET_HASHTAG_MENTIONCOUNT_HIST = """
 		GROUP BY text) as T1
 	GROUP BY num_mentions
 	ORDER BY num_mentions ASC;"""
+
+GET_HASHTAG_FREQ = """
+	SELECT text, COUNT(*) FROM hashtag as ht
+	JOIN tweethashtags as tht on ht.text=tht.hashtag
+	GROUP BY text
+	ORDER BY COUNT(*) DESC
+	LIMIT 500;"""
