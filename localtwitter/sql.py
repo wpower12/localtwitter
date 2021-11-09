@@ -218,3 +218,15 @@ RESET_COUNTY_IGNORE = ("UPDATE `county` "
 IGNORE_COUNTY = ("UPDATE `county` "
 	"SET `ignore_county`=1 "
 	"WHERE fips=%(fips)s")
+
+
+# Visulization/Reporting Queries
+
+GET_HASHTAG_MENTIONCOUNT_HIST = """
+	SELECT num_mentions, COUNT(*)
+	FROM 
+		(SELECT text, COUNT(*) as 'num_mentions' FROM hashtag as ht
+		JOIN tweethashtags as tht on ht.text=tht.hashtag
+		GROUP BY text) as T1
+	GROUP BY num_mentions
+	ORDER BY num_mentions ASC;"""
