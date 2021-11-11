@@ -39,3 +39,6 @@ So it looks like most of these are null? blarg.
 I'm gonna set up the inserts to work, and ill allow nulls for lat/long. Won't insert them but ill keep the fields. 
 
 Then I'll let it run a while and try to print out all of the above fields to see how often we'll get a lat long, and how we can handle its insert properly. 
+
+Ok so i think it's working. I'll need to update it to pull lat/long if it exists, but for now it's at least associating hashtags with counties properly. That is, its connecting a fips to a tweet, and then a hashtag to a tweet.
+
