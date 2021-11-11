@@ -37,7 +37,7 @@ def createHashtagMentionCountHistogram(cnx, log=False, fn=None, max_mentions=500
 	plt.show()
 
 
-def createHashtagWordCloud(cnx, fn=None, county_list=None, fn=None):
+def createHashtagWordCloud(cnx, fn=None, county_list=None):
 	# I think I'd like it to be parameterized by WHERE'ing on counties, if provided,
 	# as well as a limit count. That means making the SQL parameterized. 
 	cursor = cnx.cursor()
