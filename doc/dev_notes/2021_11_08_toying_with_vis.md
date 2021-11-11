@@ -22,3 +22,5 @@ This seems to be working on both local and server. Still needs more parameters, 
 
 ## Word Cloud
 I think this will be the next one to try. I need to go back to reading for a while before I can spend more cycles on this. 
+
+This is working. Just going to parameterize it a little and then tack into researching the two new possible projects. That needs to be done before you present to the group on Thursday morning. 
