@@ -59,9 +59,6 @@ def storeTweet(cnx, tweet, fips):
 		'statuses_count': tweet.user.statuses_count,
 	}
 	
-	# print("{}\n\tcoord: {}\n\t\tplace: {}".format(tweet.id, tweet.coordinates, tweet.place))
-	# print("\tuser location: {}".format(tweet.user.location))
-
 	data_tweet = {
 		'id': tweet.id,
 		'userid': tweet.user.id,
