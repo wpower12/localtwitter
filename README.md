@@ -14,7 +14,7 @@ DB_DATABASE="<YOUR-DB-DATABASE-NAME>"
 ```
 
 
-The example scripts show how to start up a full time gather, and a draft of how you'd extract named entities from the existing tweets. 
+The numbered scripts are a roughly time-ordered list of experiments/examples of how how to start up a full time gather, and a draft of how you'd extract named entities from the existing tweets. 
 
 The db methods will help create the following mysql schema:
 
