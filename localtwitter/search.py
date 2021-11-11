@@ -49,7 +49,7 @@ def geocodeSearchAndInsert(cnx, twitter_api, geocode,
 					broke = True
 					break
 
-		except tweepy.error.TooManyRequests:
+		except tweepy.TooManyRequests:
 			print("rate limited")
 			break
 

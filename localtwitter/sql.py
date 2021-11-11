@@ -12,7 +12,6 @@ CREATE_TABLES = [
 		  `followers_count` varchar(45) NOT NULL,
 		  `created_at` datetime NOT NULL,
 		  `statuses_count` int NOT NULL,
-		  `countyfips` varchar(5) NOT NULL,
 		  PRIMARY KEY (`id`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
 	"""],
@@ -23,6 +22,9 @@ CREATE_TABLES = [
 		  `userid` bigint NOT NULL,
 		  `created_at` datetime NOT NULL,
 		  `text` varchar(140) NOT NULL,
+		  `lat` decimal(10,8) DEFAULT NULL,
+		  `long` decimal(11,8) DEFAULT NULL,
+		  `countyfips` varchar(5) NOT NULL,
 		  PRIMARY KEY (`id`),
 		  KEY `user` (`userid`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=%(encoding)s;
@@ -100,21 +102,29 @@ CREATE_TABLES = [
 	"""]]
 
 CREATE_FKS = [
-	["user",
-	 ["""
-		ALTER TABLE `user` 
-		ADD CONSTRAINT `fk_couny`
-		  FOREIGN KEY (`countyfips`)
-		  REFERENCES `county` (`fips`)
-		  ON DELETE NO ACTION
-		  ON UPDATE NO ACTION;
-		"""]],
+	# ["user",
+	#  ["""
+	# 	ALTER TABLE `user` 
+	# 	ADD CONSTRAINT `fk_couny`
+	# 	  FOREIGN KEY (`countyfips`)
+	# 	  REFERENCES `county` (`fips`)
+	# 	  ON DELETE NO ACTION
+	# 	  ON UPDATE NO ACTION;
+	# 	"""]],
 	["tweet", 
 	 ["""
 		ALTER TABLE `tweet` 
 		ADD CONSTRAINT `user_fk`
 		  FOREIGN KEY (`userid`)
 		  REFERENCES `user` (`id`)
+		  ON DELETE NO ACTION
+		  ON UPDATE NO ACTION;
+		""",
+		"""
+		ALTER TABLE `tweet` 
+		ADD CONSTRAINT `fk_couny`
+		  FOREIGN KEY (`countyfips`)
+		  REFERENCES `county` (`fips`)
 		  ON DELETE NO ACTION
 		  ON UPDATE NO ACTION;
 		"""]],
@@ -154,13 +164,13 @@ CREATE_FKS = [
 	  """]],
 	["namedentity",
 	 ["""
-	 	ALTER TABLE `namednetity`
+	 	ALTER TABLE `tweetnamedentities`
 	 	ADD CONSTRAINT `fk_tweetnamedentities_ne` 
 	 	FOREIGN KEY (`nentityid`) 
 	 	REFERENCES `namedentity` (`id`)
 	  """,
 	  """
-	  ALTER TABLE `namednetity`
+	  ALTER TABLE `tweetnamedentities`
 	 	ADD CONSTRAINT `fk_tweetnamedentities_tweet` 
 	 	FOREIGN KEY (`tweetid`) 
 	 	REFERENCES `tweet` (`id`)
@@ -176,13 +186,13 @@ INSERT_COUNTY = (
 	"(%(fips)s, %(countyname)s, %(lat)s, %(long)s, %(geocode)s, %(statename)s, %(state)s)")
 
 INSERT_USER = ("INSERT IGNORE INTO `user` "
-	"(`id`,`name`,`screen_name`,`location`,`followers_count`,`created_at`, `statuses_count`, `countyfips`) "
+	"(`id`,`name`,`screen_name`,`location`,`followers_count`,`created_at`, `statuses_count`) "
 	"VALUES "
-	"(%(id)s, %(name)s, %(screen_name)s, %(location)s, %(followers_count)s, %(created_at)s, %(statuses_count)s, %(countyfips)s)")
+	"(%(id)s, %(name)s, %(screen_name)s, %(location)s, %(followers_count)s, %(created_at)s, %(statuses_count)s)")
 
 INSERT_TWEET = ("INSERT IGNORE INTO `tweet` "
-	"(`id`,`userid`,`created_at`,`text`) "
-	"VALUES (%(id)s, %(userid)s, %(created_at)s, %(text)s)")
+	"(`id`,`userid`,`created_at`,`text`, `countyfips`) "
+	"VALUES (%(id)s, %(userid)s, %(created_at)s, %(text)s, %(countyfips)s)")
 
 INSERT_HASH = ("INSERT IGNORE INTO `hashtag` "
 	"(`text`) "

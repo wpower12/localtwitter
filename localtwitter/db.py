@@ -57,14 +57,17 @@ def storeTweet(cnx, tweet, fips):
 		'followers_count': tweet.user.followers_count,
 		'created_at': datetime.strftime(tweet.user.created_at, '%Y-%m-%d %H:%M:%S'),
 		'statuses_count': tweet.user.statuses_count,
-		'countyfips': fips
 	}
+	
+	# print("{}\n\tcoord: {}\n\t\tplace: {}".format(tweet.id, tweet.coordinates, tweet.place))
+	# print("\tuser location: {}".format(tweet.user.location))
 
 	data_tweet = {
 		'id': tweet.id,
 		'userid': tweet.user.id,
 		'created_at': datetime.strftime(tweet.created_at, '%Y-%m-%d %H:%M:%S'),
-		'text': tweet.text
+		'text': tweet.text,
+		'countyfips': fips
 	}
 
 	data_lasttweet = {
