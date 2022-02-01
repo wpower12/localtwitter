@@ -3,7 +3,7 @@ from datetime import datetime
 from .sql import CREATE_TABLES, CREATE_FKS
 from .sql import INSERT_USER, INSERT_TWEET, INSERT_COUNTY
 from .sql import INSERT_HASH, INSERT_URL, INSERT_TWEETHASH, INSERT_TWEETURL
-from .sql import INSERT_NAMED_ENTITY, INSERT_TWEET_NE
+from .sql import INSERT_NAMED_ENTITY, INSERT_TWEET_NE, INSERT_TWEET_MENTION
 from .sql import UPDATE_COUNTY_LASTTWEET, IGNORE_COUNTY, RESET_COUNTY_IGNORE
 	
 		
@@ -87,7 +87,6 @@ def storeTweet(cnx, tweet, fips):
 				'tweetid': tweet.id,
 				'hashtag': hashtag['text']
 			}
-
 			cursor.execute(INSERT_HASH,      data_hash)
 			cursor.execute(INSERT_TWEETHASH, data_tweethash)
 
@@ -101,6 +100,25 @@ def storeTweet(cnx, tweet, fips):
 			}
 			cursor.execute(INSERT_URL, data_url)
 			cursor.execute(INSERT_TWEETURL, data_tweeturl)
+
+		for user_mention in tweet.entities['user_mentions']:
+			# Need to insert the mentioned user, lest the FK's in the mention insert error out. 
+			data_mentioned_user = {
+				'id': user_mention.id,
+				'name': user_mention.name,
+				'screen_name': user_mention.screen_name,
+				'location': "",
+				'followers_count': 0,
+				'created_at': datetime.strftime(tweet.user.created_at, '%Y-%m-%d %H:%M:%S'), # Just for now. Will make this nullable soon. 
+				'statuses_count': 0	
+			}
+			cursor.execute(INSERT_USER,  data_mentioned_user)
+
+			data_mention = {
+				'tweetid': tweet.id,
+				'userid': user_mention.id
+			}
+			cursor.execute(INSERT_TWEET_MENTION, data_mention)
 
 	cnx.commit()
 	cursor.close()

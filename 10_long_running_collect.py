@@ -21,7 +21,7 @@ api = tweepy.API(auth)
 
 print("full search and insert.")
 localtwitter.resetCountyIgnore(cnx)
-for i in [1, 4, 8, 32, 64]:
+for i in [8, 8, 8, 32, 32]:
 	print("running full collect; max tweets: {}".format(i*100))
 	try:
 		localtwitter.allCountySearchAndInsert(cnx, api, report=True, limit=100*i, distance="5km")
