@@ -104,9 +104,9 @@ def storeTweet(cnx, tweet, fips):
 		for user_mention in tweet.entities['user_mentions']:
 			# Need to insert the mentioned user, lest the FK's in the mention insert error out. 
 			data_mentioned_user = {
-				'id': user_mention.id,
-				'name': user_mention.name,
-				'screen_name': user_mention.screen_name,
+				'id': user_mention['id'],
+				'name': user_mention['name'],
+				'screen_name': user_mention['screen_name'],
 				'location': "",
 				'followers_count': 0,
 				'created_at': datetime.strftime(tweet.user.created_at, '%Y-%m-%d %H:%M:%S'), # Just for now. Will make this nullable soon. 
@@ -116,7 +116,7 @@ def storeTweet(cnx, tweet, fips):
 
 			data_mention = {
 				'tweetid': tweet.id,
-				'userid': user_mention.id
+				'userid': user_mention['id']
 			}
 			cursor.execute(INSERT_TWEET_MENTION, data_mention)
 

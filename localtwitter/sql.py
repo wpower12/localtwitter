@@ -219,7 +219,7 @@ INSERT_TWEET_NE = ("INSERT IGNORE INTO `tweetnamedentities` "
 	"VALUES (%(tweetid)s, %(nentityid)s)")
 
 INSERT_TWEET_MENTION = ("INSERT IGNORE INTO `mention` "
-	"(`tweetid`, `userid`) "
+	"(`tweet_id`, `user_id`) "
 	"VALUES (%(tweetid)s, %(userid)s)")
 
 UPDATE_COUNTY_LASTTWEET = ("UPDATE `county` "
