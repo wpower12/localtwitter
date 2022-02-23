@@ -170,5 +170,3 @@ def ignoreCounty(cnx, fips):
 	cursor.execute(IGNORE_COUNTY, {'fips': fips})
 	# cursor.close()
 	
-
-
