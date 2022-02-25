@@ -1,10 +1,10 @@
 import mysql.connector
 from decouple import config
 
-USERS_PER_BATCH = 100
+USERS_PER_BATCH = 2000
 
-# DATABASE_NAME = "Full_Run_01" # For lab machine
-DATABASE_NAME = "Full_Run_DB_00" # Local machine.
+DATABASE_NAME = "Full_Run_01" # For lab machine
+# DATABASE_NAME = "Full_Run_DB_00" # Local machine.
 
 cnx = mysql.connector.connect(user=config('DB_USER'),
 					password=config('DB_PASSWORD'),
@@ -26,20 +26,30 @@ MODE_TWEET_FIPS = """
 	LIMIT 1;"""
 
 UPDATE_USER_TWEET_FIPS = """
-	UPDATE `Full_Run_01`.`user`
-	SET
-	`mode_tweet_fips_00`={} 
+	UPDATE user SET `mode_tweet_fips_00`='{}'  
 	WHERE `id`={};"""
 
-cur = cnx.cursor()
-cur.execute(NON_LOCALED_USERS.format(USERS_PER_BATCH))
+running = True
+i = 1
+while running:
+	cur = cnx.cursor()
+	cur.execute(NON_LOCALED_USERS.format(USERS_PER_BATCH))
+	users = cur.fetchall()
 
-users = cur.fetchall()
-for user_row in users:
-	user_id = user_row[0]
-	cur.execute(MODE_TWEET_FIPS.format(user_id))
-	fips_mode = cur.fetchall()[0][0]
-	cur.execute(UPDATE_USER_TWEET_FIPS.format(fips_mode, user_id))
+	if len(users) == 0:
+		running = False
+		break
 
-cnx.commit()
+	for user_row in users:
+		user_id = user_row[0]
+		# print(MODE_TWEET_FIPS.format(user_id))
+		cur.execute(MODE_TWEET_FIPS.format(user_id))
+		fips_mode = cur.fetchall()[0][0]
 
+		if fips_mode != None:
+			cur.execute(UPDATE_USER_TWEET_FIPS.format(fips_mode, user_id))
+		else:
+			cur.execute(UPDATE_USER_TWEET_FIPS.format("NONE", user_id))
+	cnx.commit()
+	print("Updated {}".format(i*USERS_PER_BATCH))
+	i += 1
