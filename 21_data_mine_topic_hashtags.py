@@ -31,9 +31,14 @@ for _, seed_tag in enumerate(raw_lists):
 			tags_w_seeds[tag] = set()
 		tags_w_seeds[tag].add(seed_tag)
 
+# COUNT_SQL = """
+# 	SELECT COUNT(*) FROM tweethashtags
+# 	WHERE hashtag='{}';
+# """
+
 COUNT_SQL = """
-	SELECT COUNT(*) FROM tweethashtags
-	WHERE hashtag='{}';
+	SELECT COUNT(*) FROM tweet
+	WHERE tweet.text LIKE '%{}%';
 """
 
 tags_w_counts = {}
