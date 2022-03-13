@@ -250,3 +250,33 @@ GET_HASHTAG_FREQ = """
 	GROUP BY text
 	ORDER BY COUNT(*) DESC
 	LIMIT 500;"""
+
+# Sentiment Analysis Queries
+SENTIMENT_TABLE_CREATE = """
+	CREATE TABLE `sentiment_{}` (
+		`tweetid` bigint NOT NULL,
+		{}
+		PRIMARY KEY (`tweetid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+"""
+
+SENTIMENT_TABLE_STUB = """`{}` tinyint DEFAULT '0',\n"""
+
+SENTIMENT_TWEET_COUNT = """
+	SELECT COUNT(*) FROM `tweet`
+	WHERE `sentiment_flag`=0;"""
+
+SENTIMENT_TWEETS = """
+	SELECT `id`, `text` FROM `tweet` 
+	WHERE `sentiment_flag`=0
+	LIMIT {};"""
+
+# Parameters = (sentiment_unqid, keyword_list, tweetid, keyword_values)
+SENTIMENT_INSERT = """
+	INSERT INTO `sentiment_{}`
+	(`tweetid`, {}) VALUES ({}, {});"""
+
+SENTIMENT_RESET_FLAGS = "UPDATE `tweet` SET `sentiment_flag`=0;"
+
+SENTIMENT_SET_FLAG = "UPDATE `tweet` SET `sentiment_flag`=1 WHERE `id`={};"
+

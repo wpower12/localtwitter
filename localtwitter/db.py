@@ -5,8 +5,10 @@ from .sql import INSERT_USER, INSERT_TWEET, INSERT_COUNTY
 from .sql import INSERT_HASH, INSERT_URL, INSERT_TWEETHASH, INSERT_TWEETURL
 from .sql import INSERT_NAMED_ENTITY, INSERT_TWEET_NE, INSERT_TWEET_MENTION
 from .sql import UPDATE_COUNTY_LASTTWEET, IGNORE_COUNTY, RESET_COUNTY_IGNORE
-	
-		
+from .sql import SENTIMENT_TABLE_CREATE, SENTIMENT_TABLE_STUB, SENTIMENT_TWEETS
+from .sql import SENTIMENT_INSERT, SENTIMENT_SET_FLAG, SENTIMENT_TWEET_COUNT, SENTIMENT_RESET_FLAGS
+
+
 def createSchema(cnx, db_name, encoding="utf8mb4_0900_ai_ci"):
 	cur = cnx.cursor()
 	cur.execute("CREATE DATABASE {};".format(db_name))
@@ -168,5 +170,58 @@ def resetCountyIgnore(cnx):
 def ignoreCounty(cnx, fips):
 	cursor = cnx.cursor()
 	cursor.execute(IGNORE_COUNTY, {'fips': fips})
-	# cursor.close()
 	
+"""
+Sentiment Analysis 
+"""
+def createAnalysisTable(cnx, unq_id, keywords):
+	tables = ""
+	for keyword in keywords:
+		tables += SENTIMENT_TABLE_STUB.format(keyword)
+	tables = tables.rstrip()
+	FULL_QUERY = SENTIMENT_TABLE_CREATE.format(unq_id, tables)
+	cursor = cnx.cursor()
+	cursor.execute(FULL_QUERY)
+
+
+def getTweetCount(cnx):
+	cursor = cnx.cursor()
+	cursor.execute(SENTIMENT_TWEET_COUNT)
+	return cursor.fetchone()[0]
+
+
+def getSentimentTweetBatch(cnx, batch_size):
+	cursor = cnx.cursor()
+	cursor.execute(SENTIMENT_TWEETS.format(batch_size))
+	return cursor.fetchall()
+
+
+def insertTweetSentiment(cnx, unq_id, tweet_id, keywords, sent_value):	
+	keyword_str = ""
+	value_str = ""
+	for kw in keywords:
+		keyword_str += "{}, ".format(kw)
+		value_str += "{}, ".format(sent_value)
+	keyword_str = keyword_str[:-2]
+	value_str = value_str[:-2]
+
+	# parameters = (sentiment_unqid, keyword_list, tweetid, keyword_values)
+	cursor = cnx.cursor()
+	cursor.execute(SENTIMENT_INSERT.format(
+		unq_id,
+		keyword_str,
+		tweet_id,
+		value_str))
+	cnx.commit()
+
+
+def setSentimentFlag(cnx, tweet_id):
+	cursor = cnx.cursor()
+	cursor.execute(SENTIMENT_SET_FLAG.format(tweet_id))
+	cnx.commit()
+
+
+def resetSentimentFlags(cnx):
+	cursor = cnx.cursor()
+	cursor.execute(resetSentimentFlags)
+	cnx.commit()

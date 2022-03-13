@@ -1,8 +1,8 @@
-from .db     import createSchema, populateCountyTable, resetCountyIgnore
+from .db     import createSchema, populateCountyTable, resetCountyIgnore, createAnalysisTable
 from .search import geocodeSearchAndInsert, allCountySearchAndInsert
-from .nlp    import processTweetForNamedEntities
+from .nlp    import processTweetForNamedEntities, analyizeTweetSentiment
 from .vis    import createHashtagMentionCountHistogram, createHashtagWordCloud
-from .util   import pprintTweet
+from .util   import pprintTweet, read_csv_to_dict
 
 __all__ = ["createSchema", 
 	"populateCountyTable", 
@@ -11,4 +11,7 @@ __all__ = ["createSchema",
 	"processTweetForNamedEntities",
 	"createHashtagMentionCountHistogram",
 	"resetCountyIgnore",
-	"pprintTweet"]
+	"pprintTweet",
+	"read_csv_to_dict",
+	"createAnalysisTable",
+	"analyizeTweetSentiment"]
