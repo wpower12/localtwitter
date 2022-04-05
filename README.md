@@ -33,4 +33,4 @@ Outputs from the 14th script; [14_test_vis_wordclouds](14_test_vis_wordclouds.py
 ### Choropleths
 Output from the 16th script; (16_test_choropleth)(16_test_choropleth.py)
 ![choropleth example - log tweet count](doc/choropleth_logtweets.png)
-![choropleth example - log unq ht count](doc/choropleth_log_unqht_count_.png)
+![choropleth example - log unq ht count](doc/choropleth_log_unqht_count.png)
