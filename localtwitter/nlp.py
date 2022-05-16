@@ -4,6 +4,7 @@ from .db import setSentimentFlag, getTweetCount, resetSentimentFlags
 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
+
 def processTweetForNamedEntities(cnx, nlp_parser, tweet):
 	t_id, u_id, dtime, t_text, _ = tweet
 	tweet_doc = nlp_parser(t_text)
