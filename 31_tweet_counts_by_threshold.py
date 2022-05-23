@@ -19,7 +19,7 @@ COUNT_THRESH_SQL = """
 THRESHOLDS = [i*0.05 for i in range(0, 20+1)]
 
 with open(OUTPUT_FN, 'w') as f:
-	f.write("threshold, tweet_count")
+	f.write("threshold, tweet_count\n")
 	cur = cnx.cursor()
 	for t in THRESHOLDS:
 		cur.execute(COUNT_THRESH_SQL.format(COL_NAME, t))
